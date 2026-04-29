@@ -2,7 +2,77 @@
 <html>
 <head>
   <title>BFN ISP Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+    }
+
+    .header {
+      background: #0f172a;
+      color: white;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .nav {
+      background: white;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      box-shadow: 0 2px 8px #ddd;
+    }
+
+    .nav a, .nav button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 450px;
+      margin: 25px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px #ddd;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    #message {
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
 </head>
+
 <body>
 
 <script>
@@ -11,24 +81,30 @@
   }
 </script>
 
-<h1>BFN ISP Billing Bangladesh</h1>
+<div class="header">
+  <h1>BFN ISP Billing</h1>
+  <p>Customer Billing Management System</p>
+</div>
 
-<a href="customers.html">View Customers</a>
-<br><br>
+<div class="nav">
+  <a href="customers.html">Customers</a>
+  <button onclick="logout()">Logout</button>
+</div>
 
-<h2>Add Customer</h2>
+<div class="container">
+  <h2>Add Customer</h2>
 
-<input id="full_name" placeholder="Full Name"><br><br>
-<input id="phone" placeholder="Phone Number"><br><br>
-<input id="address" placeholder="Address"><br><br>
-<input id="pppoe_username" placeholder="PPPoE Username"><br><br>
-<input id="package_name" placeholder="Package Name"><br><br>
-<input id="monthly_bill" placeholder="Monthly Bill"><br><br>
+  <input id="full_name" placeholder="Full Name">
+  <input id="phone" placeholder="Phone Number">
+  <input id="address" placeholder="Address">
+  <input id="pppoe_username" placeholder="PPPoE Username">
+  <input id="package_name" placeholder="Package Name">
+  <input id="monthly_bill" placeholder="Monthly Bill">
 
-<button onclick="addCustomer()">Add Customer</button>
-<button onclick="logout()">Logout</button>
+  <button onclick="addCustomer()">Add Customer</button>
 
-<p id="message"></p>
+  <p id="message"></p>
+</div>
 
 <script>
 const API_URL = "https://bfn-isp-billing.onrender.com";
