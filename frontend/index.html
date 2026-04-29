@@ -6,14 +6,49 @@
 <body>
   <h1>BFN ISP Billing Bangladesh</h1>
 
-  <ul>
-    <li>Customer Add</li>
-    <li>Package Add</li>
-    <li>Bill Record</li>
-    <li>Payment Status</li>
-    <li>Due List</li>
-    <li>Manual Enable / Disable</li>
-    <li>MikroTik API Connect</li>
-  </ul>
+  <h2>Add Customer</h2>
+
+  <input id="full_name" placeholder="Full Name"><br><br>
+  <input id="phone" placeholder="Phone Number"><br><br>
+  <input id="address" placeholder="Address"><br><br>
+  <input id="pppoe_username" placeholder="PPPoE Username"><br><br>
+  <input id="package_name" placeholder="Package Name"><br><br>
+  <input id="monthly_bill" placeholder="Monthly Bill"><br><br>
+
+  <button onclick="addCustomer()">Add Customer</button>
+
+  <p id="message"></p>
+
+  <script>
+    const API_URL = "https://bfn-isp-billing.onrender.com";
+
+    async function addCustomer() {
+      const customer = {
+        full_name: document.getElementById("full_name").value,
+        phone: document.getElementById("phone").value,
+        address: document.getElementById("address").value,
+        pppoe_username: document.getElementById("pppoe_username").value,
+        package_name: document.getElementById("package_name").value,
+        monthly_bill: Number(document.getElementById("monthly_bill").value),
+        status: "active"
+      };
+
+      const res = await fetch(API_URL + "/customers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(customer)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        document.getElementById("message").innerText = "Customer added successfully ✅";
+      } else {
+        document.getElementById("message").innerText = "Error: " + data.error;
+      }
+    }
+  </script>
 </body>
 </html>
