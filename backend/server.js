@@ -29,6 +29,33 @@ app.post("/login", (req, res) => {
   }
 });
 
+// ❌ Delete customer
+app.delete("/customers/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  const { error } = await supabase
+    .from("customers")
+    .delete()
+    .eq("id", id);
+
+  if (error) return res.status(400).json({ error });
+  res.json({ success: true });
+});
+
+// ✏️ Update customer
+app.put("/customers/:id", verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const { full_name, phone, address, pppoe_username, package_name, monthly_bill } = req.body;
+
+  const { error } = await supabase
+    .from("customers")
+    .update({ full_name, phone, address, pppoe_username, package_name, monthly_bill })
+    .eq("id", id);
+
+  if (error) return res.status(400).json({ error });
+  res.json({ success: true });
+});
+
 // 🔐 middleware
 function verifyToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
