@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bills - BFN ISP Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body{margin:0;font-family:Arial;background:#eef2f7}
+    .topbar{background:#0f172a;color:white;padding:15px;display:flex;justify-content:space-between}
+    .layout{display:flex;min-height:100vh}
+    .sidebar{width:230px;background:#111827;color:white;padding:15px}
+    .sidebar h3{color:#22c55e}
+    .sidebar a{display:block;color:white;text-decoration:none;padding:12px;border-radius:8px;margin:6px 0;background:#1f2937}
+    .main{flex:1;padding:20px}
+    .box{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 12px #d1d5db;margin-bottom:20px}
+    input,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc}
+    button{padding:10px;border:none;border-radius:8px;background:#16a34a;color:white}
+    table{width:100%;border-collapse:collapse;background:white}
+    th{background:#1f2937;color:white;padding:12px}
+    td{padding:12px;border-bottom:1px solid #eee}
+    .paid{color:#16a34a;font-weight:bold}
+    .unpaid{color:#ef4444;font-weight:bold}
+  </style>
+</head>
+
+<body>
+
+<script>
+if (!localStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
+</script>
+
+<div class="topbar">
+  <b>🇧🇩 BFN ISP Billing</b>
+  <button onclick="logout()" style="background:#ef4444">Logout</button>
+</div>
+
+<div class="layout">
+
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <a href="index.html">📊 Dashboard</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="bills.html">💳 Bills</a>
+    <a href="settings.html">⚙️ Settings</a>
+  </div>
+
+  <div class="main">
+
+    <h2>Monthly Bills</h2>
+
+    <!-- CREATE BILL -->
+    <div class="box">
+      <h3>Create Bill</h3>
+
+      <select id="customer_id"></select>
+      <input id="month" placeholder="Month (e.g. April 2026)">
+      <input id="amount" placeholder="Amount">
+
+      <button onclick="createBill()">Create Bill</button>
+      <p id="msg"></p>
+    </div>
+
+    <!-- BILL LIST -->
+    <div class="box">
+      <h3>Bill List</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Month</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody id="billTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const API = "https://bfn-isp-billing.onrender.com";
+const token = localStorage.getItem("token");
+
+// 🔹 Load customers for dropdown
+async function loadCustomers() {
+  const res = await fetch(API + "/customers", {
+    headers: {"Authorization":"Bearer " + token}
+  });
+
+  const data = await res.json();
+
+  let options = '<option value="">Select Customer</option>';
+
+  data.forEach(c => {
+    options += `<option value="${c.id}">${c.full_name} - ${c.phone}</option>`;
+  });
+
+  document.getElementById("customer_id").innerHTML = options;
+}
+
+// 🔹 Create bill
+async function createBill() {
+  const res = await fetch(API + "/bills", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer " + token
+    },
+    body: JSON.stringify({
+      customer_id: document.getElementById("customer_id").value,
+      month: document.getElementById("month").value,
+      amount: Number(document.getElementById("amount").value)
+    })
+  });
+
+  if (res.ok) {
+    document.getElementById("msg").innerText = "Bill created ✅";
+    loadBills();
+  } else {
+    document.getElementById("msg").innerText = "Error ❌";
+  }
+}
+
+// 🔹 Load bills
+async function loadBills() {
+  const res = await fetch(API + "/bills", {
+    headers: {"Authorization":"Bearer " + token}
+  });
+
+  const data = await res.json();
+
+  let html = "";
+
+  data.forEach(b => {
+    html += `
+      <tr>
+        <td>${b.customers?.full_name || ""}</td>
+        <td>${b.customers?.phone || ""}</td>
+        <td>${b.month}</td>
+        <td>৳${b.amount}</td>
+        <td class="${b.status}">${b.status}</td>
+        <td>
+          ${b.status !== "paid"
+            ? `<button onclick="markPaid(${b.id}, ${b.amount})">Paid</button>`
+            : "✔️"}
+        </td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("billTable").innerHTML = html;
+}
+
+// 🔹 Mark paid
+async function markPaid(id, amount) {
+  await fetch(API + "/bills/" + id + "/paid", {
+    method:"PUT",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":"Bearer " + token
+    },
+    body: JSON.stringify({ paid_amount: amount })
+  });
+
+  loadBills();
+}
+
+// 🔹 Logout
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+loadCustomers();
+loadBills();
+</script>
+
+</body>
+</html>
