@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Customer</title>
+</head>
+<body>
+
+<script>
+  if (!localStorage.getItem("token")) {
+    window.location.href = "login.html";
+  }
+</script>
+
+<h2>Edit Customer</h2>
+
+<input id="name"><br><br>
+<input id="phone"><br><br>
+<input id="package"><br><br>
+<input id="bill"><br><br>
+
+<button onclick="updateCustomer()">Update</button>
+
+<script>
+const API = "https://bfn-isp-billing.onrender.com";
+const id = new URLSearchParams(window.location.search).get("id");
+
+async function updateCustomer() {
+  const token = localStorage.getItem("token");
+
+  await fetch(API + "/customers/" + id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({
+      full_name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      package_name: document.getElementById("package").value,
+      monthly_bill: Number(document.getElementById("bill").value)
+    })
+  });
+
+  window.location.href = "customers.html";
+}
+</script>
+
+</body>
+</html>
