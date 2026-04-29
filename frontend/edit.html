@@ -1,48 +1,140 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Edit Customer</title>
+  <title>Edit Customer - BFN ISP Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#eef2f7;color:#111827}
+    .topbar{background:#0f172a;color:white;padding:15px 18px;display:flex;justify-content:space-between;align-items:center}
+    .brand{font-size:20px;font-weight:bold}
+    .logout{background:#ef4444;color:white;border:0;padding:9px 14px;border-radius:8px}
+    .layout{display:flex;min-height:100vh}
+    .sidebar{width:230px;background:#111827;color:white;padding:18px}
+    .sidebar h3{margin-top:0;color:#22c55e}
+    .sidebar a{display:block;color:white;text-decoration:none;padding:12px;border-radius:8px;margin:6px 0;background:#1f2937}
+    .main{flex:1;padding:20px}
+    .form-box{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 12px #d1d5db;max-width:650px}
+    input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:8px}
+    .btn{background:#2563eb;color:white;border:0;padding:12px;border-radius:8px;width:100%;font-size:16px;margin-top:10px}
+    .back{display:inline-block;margin-bottom:15px;text-decoration:none;background:#111827;color:white;padding:10px 14px;border-radius:8px}
+    @media(max-width:800px){.layout{display:block}.sidebar{width:100%}}
+  </style>
 </head>
+
 <body>
 
 <script>
-  if (!localStorage.getItem("token")) {
-    window.location.href = "login.html";
-  }
+if (!localStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
 </script>
 
-<h2>Edit Customer</h2>
+<div class="topbar">
+  <div class="brand">🇧🇩 BFN ISP Billing</div>
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
 
-<input id="name"><br><br>
-<input id="phone"><br><br>
-<input id="package"><br><br>
-<input id="bill"><br><br>
+<div class="layout">
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <a href="index.html">📊 Dashboard</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="#">💳 Bills</a>
+    <a href="#">💰 Payments</a>
+    <a href="#">📡 MikroTik</a>
+    <a href="#">⚙️ Settings</a>
+  </div>
 
-<button onclick="updateCustomer()">Update</button>
+  <div class="main">
+    <a class="back" href="customers.html">← Back to Customers</a>
+
+    <div class="form-box">
+      <h2>Edit Customer</h2>
+
+      <input id="full_name" placeholder="Customer Full Name">
+      <input id="phone" placeholder="Mobile Number">
+      <input id="address" placeholder="Address / Area">
+      <input id="pppoe_username" placeholder="PPPoE Username">
+
+      <select id="package_name">
+        <option value="">Select Package</option>
+        <option value="5 Mbps">5 Mbps</option>
+        <option value="10 Mbps">10 Mbps</option>
+        <option value="15 Mbps">15 Mbps</option>
+        <option value="20 Mbps">20 Mbps</option>
+      </select>
+
+      <input id="monthly_bill" placeholder="Monthly Bill Amount">
+
+      <button class="btn" onclick="updateCustomer()">Update Customer</button>
+      <p id="message"></p>
+    </div>
+  </div>
+</div>
 
 <script>
 const API = "https://bfn-isp-billing.onrender.com";
 const id = new URLSearchParams(window.location.search).get("id");
 
+async function loadCustomer() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(API + "/customers", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+
+  const data = await res.json();
+  const customer = data.find(c => String(c.id) === String(id));
+
+  if (!customer) {
+    document.getElementById("message").innerText = "Customer not found";
+    return;
+  }
+
+  document.getElementById("full_name").value = customer.full_name || "";
+  document.getElementById("phone").value = customer.phone || "";
+  document.getElementById("address").value = customer.address || "";
+  document.getElementById("pppoe_username").value = customer.pppoe_username || "";
+  document.getElementById("package_name").value = customer.package_name || "";
+  document.getElementById("monthly_bill").value = customer.monthly_bill || "";
+}
+
 async function updateCustomer() {
   const token = localStorage.getItem("token");
 
-  await fetch(API + "/customers/" + id, {
+  const updatedCustomer = {
+    full_name: document.getElementById("full_name").value,
+    phone: document.getElementById("phone").value,
+    address: document.getElementById("address").value,
+    pppoe_username: document.getElementById("pppoe_username").value,
+    package_name: document.getElementById("package_name").value,
+    monthly_bill: Number(document.getElementById("monthly_bill").value)
+  };
+
+  const res = await fetch(API + "/customers/" + id, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + token
     },
-    body: JSON.stringify({
-      full_name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      package_name: document.getElementById("package").value,
-      monthly_bill: Number(document.getElementById("bill").value)
-    })
+    body: JSON.stringify(updatedCustomer)
   });
 
-  window.location.href = "customers.html";
+  if (res.ok) {
+    window.location.href = "customers.html";
+  } else {
+    document.getElementById("message").innerText = "Update failed";
+  }
 }
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+loadCustomer();
 </script>
 
 </body>
