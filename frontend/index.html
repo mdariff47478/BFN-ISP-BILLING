@@ -1,71 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{margin:0;font-family:Arial;background:#eef2f7}
-.topbar{background:#0f172a;color:white;padding:15px;display:flex;justify-content:space-between}
-.layout{display:flex}
-.sidebar{width:220px;background:#111827;color:white;padding:15px}
-.sidebar a{display:block;color:white;padding:12px;margin:5px 0;background:#1f2937;text-decoration:none;border-radius:8px}
-.main{flex:1;padding:20px}
-.card{background:white;padding:15px;border-radius:10px;margin:10px 0}
-</style>
+  <title>ড্যাশবোর্ড - BFN ISP Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-<script>
-if(!localStorage.getItem("token")) location.href="login.html";
-</script>
+<script src="script.js"></script>
+<script>protect();</script>
 
 <div class="topbar">
-<b>🇧🇩 BFN ISP Billing</b>
-<button onclick="logout()">Logout</button>
+  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
+  <button class="btn btn-red" onclick="logout()">লগআউট</button>
 </div>
 
 <div class="layout">
+  <div class="sidebar">
+    <a href="index.html">📊 ড্যাশবোর্ড</a>
+    <a href="customers.html">👥 কাস্টমার</a>
+    <a href="bills.html">💳 বিল</a>
+    <a href="settings.html">⚙️ সেটিংস</a>
+    <a href="#" onclick="logout()">🚪 লগআউট</a>
+  </div>
 
-<div class="sidebar">
-<a href="index.html">📊 Dashboard</a>
-<a href="customers.html">👥 Customers</a>
-<a href="bills.html">💳 Bills</a>
-<a href="settings.html">⚙️ Settings</a>
-</div>
+  <div class="main">
+    <h2>🇧🇩 বাংলাদেশী ISP বিলিং ড্যাশবোর্ড</h2>
 
-<div class="main">
-<h2>Dashboard</h2>
+    <div class="cards">
+      <div class="card"><h4>মোট কাস্টমার</h4><p id="total">0</p></div>
+      <div class="card"><h4>Active</h4><p id="active">0</p></div>
+      <div class="card"><h4>Disabled</h4><p id="disabled">0</p></div>
+      <div class="card"><h4>মোট বকেয়া</h4><p id="due">৳0</p></div>
+      <div class="card"><h4>মাসিক কালেকশন</h4><p id="collection">৳0</p></div>
+    </div>
 
-<div class="card">Total Customers: <span id="total">0</span></div>
-<div class="card">Monthly Income: ৳<span id="income">0</span></div>
+    <div class="box">
+      <h3>Recent Customers</h3>
+      <table>
+        <thead><tr><th>নাম</th><th>মোবাইল</th><th>প্যাকেজ</th><th>স্ট্যাটাস</th></tr></thead>
+        <tbody id="recentCustomers"></tbody>
+      </table>
+    </div>
 
-</div>
-
+    <div class="box">
+      <h3>Due Bills</h3>
+      <table>
+        <thead><tr><th>কাস্টমার</th><th>মাস</th><th>বিল</th><th>Due</th></tr></thead>
+        <tbody id="dueBills"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-const API="https://bfn-isp-billing.onrender.com";
-const token=localStorage.getItem("token");
+renderCommon();
 
-async function load(){
-const res=await fetch(API+"/customers",{headers:{Authorization:"Bearer "+token}});
-const data=await res.json();
+const customers = getCustomers();
+const bills = getBills();
 
-document.getElementById("total").innerText=data.length;
+document.getElementById("total").innerText = customers.length;
+document.getElementById("active").innerText = customers.filter(c=>c.status==="Active").length;
+document.getElementById("disabled").innerText = customers.filter(c=>c.status==="Disabled").length;
 
-let income=0;
-data.forEach(c=>income+=Number(c.monthly_bill||0));
-document.getElementById("income").innerText=income;
-}
+let due = 0, collection = 0;
+bills.forEach(b=>{
+  const d = Number(b.amount) - Number(b.paidAmount || 0);
+  if(b.status !== "Paid") due += d;
+  collection += Number(b.paidAmount || 0);
+});
+document.getElementById("due").innerText = money(due);
+document.getElementById("collection").innerText = money(collection);
 
-function logout(){
-localStorage.removeItem("token");
-location.href="login.html";
-}
+document.getElementById("recentCustomers").innerHTML = customers.slice(-5).reverse().map(c=>`
+<tr>
+<td>${c.fullName}</td><td>${c.mobile}</td><td>${c.packageName}</td>
+<td><span class="badge ${c.status==="Active"?"active":"disabled"}">${c.status}</span></td>
+</tr>
+`).join("");
 
-load();
+document.getElementById("dueBills").innerHTML = bills.filter(b=>b.status!=="Paid").slice(-5).reverse().map(b=>{
+  const c = customers.find(x=>x.id==b.customerId) || {};
+  const d = Number(b.amount)-Number(b.paidAmount||0);
+  return `<tr><td>${c.fullName||"N/A"}</td><td>${b.month}</td><td>${money(b.amount)}</td><td>${money(d)}</td></tr>`;
+}).join("");
 </script>
-
 </body>
 </html>
