@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Customers List</title>
+</head>
+<body>
+
+<h1>All Customers</h1>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Phone</th>
+      <th>Package</th>
+      <th>Bill</th>
+    </tr>
+  </thead>
+  <tbody id="customerTable"></tbody>
+</table>
+
+<script>
+const API_URL = "https://bfn-isp-billing.onrender.com";
+
+async function loadCustomers() {
+  const res = await fetch(API_URL + "/customers");
+  const data = await res.json();
+
+  let html = "";
+
+  data.forEach(c => {
+    html += `
+      <tr>
+        <td>${c.full_name}</td>
+        <td>${c.phone}</td>
+        <td>${c.package_name}</td>
+        <td>${c.monthly_bill}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById("customerTable").innerHTML = html;
+}
+
+loadCustomers();
+</script>
+
+</body>
+</html>
