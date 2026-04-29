@@ -1,188 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Bills - BFN ISP Billing</title>
+  <title>বিল - BFN ISP Billing</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body{margin:0;font-family:Arial;background:#eef2f7}
-    .topbar{background:#0f172a;color:white;padding:15px;display:flex;justify-content:space-between}
-    .layout{display:flex;min-height:100vh}
-    .sidebar{width:230px;background:#111827;color:white;padding:15px}
-    .sidebar h3{color:#22c55e}
-    .sidebar a{display:block;color:white;text-decoration:none;padding:12px;border-radius:8px;margin:6px 0;background:#1f2937}
-    .main{flex:1;padding:20px}
-    .box{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 12px #d1d5db;margin-bottom:20px}
-    input,select{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #ccc}
-    button{padding:10px;border:none;border-radius:8px;background:#16a34a;color:white}
-    table{width:100%;border-collapse:collapse;background:white}
-    th{background:#1f2937;color:white;padding:12px}
-    td{padding:12px;border-bottom:1px solid #eee}
-    .paid{color:#16a34a;font-weight:bold}
-    .unpaid{color:#ef4444;font-weight:bold}
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-<script>
-if (!localStorage.getItem("token")) {
-  window.location.href = "login.html";
-}
-</script>
+<script src="script.js"></script>
+<script>protect();</script>
 
 <div class="topbar">
-  <b>🇧🇩 BFN ISP Billing</b>
-  <button onclick="logout()" style="background:#ef4444">Logout</button>
+  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
+  <button class="btn btn-red" onclick="logout()">লগআউট</button>
 </div>
 
 <div class="layout">
-
   <div class="sidebar">
-    <h3>Admin Panel</h3>
-    <a href="index.html">📊 Dashboard</a>
-    <a href="customers.html">👥 Customers</a>
-    <a href="bills.html">💳 Bills</a>
-    <a href="settings.html">⚙️ Settings</a>
+    <a href="index.html">📊 ড্যাশবোর্ড</a>
+    <a href="customers.html">👥 কাস্টমার</a>
+    <a href="bills.html">💳 বিল</a>
+    <a href="settings.html">⚙️ সেটিংস</a>
   </div>
 
   <div class="main">
-
-    <h2>Monthly Bills</h2>
-
-    <!-- CREATE BILL -->
     <div class="box">
-      <h3>Create Bill</h3>
-
-      <select id="customer_id"></select>
-      <input id="month" placeholder="Month (e.g. April 2026)">
-      <input id="amount" placeholder="Amount">
-
-      <button onclick="createBill()">Create Bill</button>
-      <p id="msg"></p>
+      <h2>💳 মাসিক বিল তৈরি করুন</h2>
+      <div class="form-grid">
+        <select id="customerId"></select>
+        <input id="month" placeholder="মাস যেমন: April 2026">
+        <input id="amount" type="number" placeholder="বিল Amount">
+        <input id="paidAmount" type="number" placeholder="Paid Amount">
+        <select id="billStatus">
+          <option value="Unpaid">Unpaid</option>
+          <option value="Partial">Partial</option>
+          <option value="Paid">Paid</option>
+        </select>
+      </div>
+      <button class="btn" onclick="saveBill()">বিল সেভ করুন</button>
     </div>
 
-    <!-- BILL LIST -->
     <div class="box">
-      <h3>Bill List</h3>
+      <h2>Bill List</h2>
+      <select id="filter" onchange="loadBills()">
+        <option value="All">সব বিল</option>
+        <option value="Paid">Paid</option>
+        <option value="Unpaid">Unpaid</option>
+        <option value="Partial">Partial</option>
+      </select>
 
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Month</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>কাস্টমার</th><th>মাস</th><th>বিল</th><th>Paid</th><th>Due</th><th>Status</th><th>Print</th>
           </tr>
         </thead>
-
         <tbody id="billTable"></tbody>
       </table>
     </div>
-
   </div>
-
 </div>
 
 <script>
-const API = "https://bfn-isp-billing.onrender.com";
-const token = localStorage.getItem("token");
+renderCommon();
 
-// 🔹 Load customers for dropdown
-async function loadCustomers() {
-  const res = await fetch(API + "/customers", {
-    headers: {"Authorization":"Bearer " + token}
-  });
-
-  const data = await res.json();
-
-  let options = '<option value="">Select Customer</option>';
-
-  data.forEach(c => {
-    options += `<option value="${c.id}">${c.full_name} - ${c.phone}</option>`;
-  });
-
-  document.getElementById("customer_id").innerHTML = options;
+function loadCustomerSelect(){
+  const customers = getCustomers();
+  customerId.innerHTML = `<option value="">কাস্টমার সিলেক্ট করুন</option>` +
+    customers.map(c=>`<option value="${c.id}">${c.fullName} - ${c.mobile}</option>`).join("");
 }
 
-// 🔹 Create bill
-async function createBill() {
-  const res = await fetch(API + "/bills", {
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization":"Bearer " + token
-    },
-    body: JSON.stringify({
-      customer_id: document.getElementById("customer_id").value,
-      month: document.getElementById("month").value,
-      amount: Number(document.getElementById("amount").value)
-    })
+function saveBill(){
+  const bills = getBills();
+  bills.push({
+    id:Date.now(),
+    customerId:customerId.value,
+    month:month.value,
+    amount:Number(amount.value),
+    paidAmount:Number(paidAmount.value || 0),
+    status:billStatus.value
   });
-
-  if (res.ok) {
-    document.getElementById("msg").innerText = "Bill created ✅";
-    loadBills();
-  } else {
-    document.getElementById("msg").innerText = "Error ❌";
-  }
+  saveBills(bills);
+  loadBills();
+  alert("বিল সেভ হয়েছে ✅");
 }
 
-// 🔹 Load bills
-async function loadBills() {
-  const res = await fetch(API + "/bills", {
-    headers: {"Authorization":"Bearer " + token}
-  });
+function loadBills(){
+  const customers = getCustomers();
+  let bills = getBills();
+  const f = filter.value;
+  if(f !== "All") bills = bills.filter(b=>b.status === f);
 
-  const data = await res.json();
-
-  let html = "";
-
-  data.forEach(b => {
-    html += `
+  billTable.innerHTML = bills.map(b=>{
+    const c = customers.find(x=>x.id == b.customerId) || {};
+    const due = Number(b.amount) - Number(b.paidAmount || 0);
+    const cls = b.status.toLowerCase();
+    return `
       <tr>
-        <td>${b.customers?.full_name || ""}</td>
-        <td>${b.customers?.phone || ""}</td>
+        <td>${c.fullName || "N/A"}</td>
         <td>${b.month}</td>
-        <td>৳${b.amount}</td>
-        <td class="${b.status}">${b.status}</td>
-        <td>
-          ${b.status !== "paid"
-            ? `<button onclick="markPaid(${b.id}, ${b.amount})">Paid</button>`
-            : "✔️"}
-        </td>
+        <td>${money(b.amount)}</td>
+        <td>${money(b.paidAmount)}</td>
+        <td>${money(due)}</td>
+        <td><span class="badge ${cls}">${b.status}</span></td>
+        <td><button class="btn btn-blue" onclick="printBill(${b.id})">Print</button></td>
       </tr>
     `;
-  });
-
-  document.getElementById("billTable").innerHTML = html;
+  }).join("");
 }
 
-// 🔹 Mark paid
-async function markPaid(id, amount) {
-  await fetch(API + "/bills/" + id + "/paid", {
-    method:"PUT",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization":"Bearer " + token
-    },
-    body: JSON.stringify({ paid_amount: amount })
-  });
+function printBill(id){
+  const bills = getBills();
+  const customers = getCustomers();
+  const b = bills.find(x=>x.id == id);
+  const c = customers.find(x=>x.id == b.customerId) || {};
+  const s = getSettings();
 
-  loadBills();
+  const win = window.open("", "_blank");
+  win.document.write(`
+    <h2>${s.ispName}</h2>
+    <hr>
+    <p><b>Customer:</b> ${c.fullName}</p>
+    <p><b>Mobile:</b> ${c.mobile}</p>
+    <p><b>Month:</b> ${b.month}</p>
+    <p><b>Amount:</b> ${money(b.amount)}</p>
+    <p><b>Paid:</b> ${money(b.paidAmount)}</p>
+    <p><b>Due:</b> ${money(Number(b.amount)-Number(b.paidAmount||0))}</p>
+    <p><b>Status:</b> ${b.status}</p>
+    <hr>
+    <p>bKash: ${s.bkash || "N/A"} | Nagad: ${s.nagad || "N/A"} | Rocket: ${s.rocket || "N/A"}</p>
+  `);
+  win.print();
 }
 
-// 🔹 Logout
-function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "login.html";
-}
-
-loadCustomers();
+loadCustomerSelect();
 loadBills();
 </script>
-
 </body>
 </html>
