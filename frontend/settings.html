@@ -1,73 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-  <title>সেটিংস - BFN ISP Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings | BFN ISP Billing Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<script src="script.js"></script>
-<script>protect();</script>
+<body data-page="settings">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-logo">BFN</div><div><h2>BFN ISP</h2><p>Billing Bangladesh</p></div></div>
+      <nav class="menu">
+        <a href="index.html">📊 ড্যাশবোর্ড</a>
+        <a href="customers.html">👥 কাস্টমার</a>
+        <a href="add-customer.html">➕ নতুন কাস্টমার</a>
+        <a href="bills.html">💳 বিলিং</a>
+        <a class="active" href="settings.html">⚙️ সেটিংস</a>
+        <button onclick="logout()">🚪 লগআউট</button>
+      </nav>
+    </aside>
 
-<div class="topbar">
-  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
-  <button class="btn btn-red" onclick="logout()">লগআউট</button>
-</div>
+    <main class="main">
+      <header class="topbar">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="search-box">🔎 <input type="text" placeholder="সার্চ করুন..." /></div>
+        <div class="top-actions"><span id="currentDate"></span><span class="bell">🔔</span><span class="profile-chip">👤 Admin</span></div>
+      </header>
 
-<div class="layout">
-  <div class="sidebar">
-    <a href="index.html">📊 ড্যাশবোর্ড</a>
-    <a href="customers.html">👥 কাস্টমার</a>
-    <a href="bills.html">💳 বিল</a>
-    <a href="settings.html">⚙️ সেটিংস</a>
+      <section class="page-head">
+        <div><h1>সেটিংস</h1><p>ISP প্রোফাইল, পেমেন্ট এবং অ্যাডমিন লগইন সেটিংস</p></div>
+      </section>
+
+      <form id="settingsForm" class="settings-grid">
+        <section class="panel settings-card">
+          <h3>🏢 ISP Profile Settings</h3>
+          <label>ISP Name<input name="ispName" type="text" required></label>
+          <label>ISP Mobile<input name="ispMobile" type="text" required></label>
+          <label>ISP Address<input name="ispAddress" type="text" required></label>
+        </section>
+
+        <section class="panel settings-card">
+          <h3>💳 Payment Settings</h3>
+          <label>bKash Number<input name="bkash" type="text"></label>
+          <label>Nagad Number<input name="nagad" type="text"></label>
+          <label>Rocket Number<input name="rocket" type="text"></label>
+        </section>
+
+        <section class="panel settings-card">
+          <h3>🔐 Admin Login Settings</h3>
+          <label>Admin Username<input name="adminUsername" type="text" required></label>
+          <label>Admin Password<input name="adminPassword" type="password" required></label>
+        </section>
+
+        <div class="settings-actions">
+          <button class="btn btn-primary" type="submit">Save Settings</button>
+        </div>
+      </form>
+    </main>
   </div>
 
-  <div class="main">
-    <div class="box">
-      <h2>⚙️ ISP সেটিংস</h2>
-
-      <label>ISP Name</label>
-      <input id="ispName" placeholder="ISP Name">
-
-      <label>Logo URL</label>
-      <input id="logoUrl" placeholder="Logo image URL">
-
-      <label>bKash Number</label>
-      <input id="bkash" placeholder="bKash Number">
-
-      <label>Nagad Number</label>
-      <input id="nagad" placeholder="Nagad Number">
-
-      <label>Rocket Number</label>
-      <input id="rocket" placeholder="Rocket Number">
-
-      <button class="btn" onclick="save()">সেভ করুন</button>
-      <p id="msg"></p>
-    </div>
-  </div>
-</div>
-
-<script>
-renderCommon();
-
-const s = getSettings();
-ispName.value = s.ispName;
-logoUrl.value = s.logoUrl;
-bkash.value = s.bkash;
-nagad.value = s.nagad;
-rocket.value = s.rocket;
-
-function save(){
-  saveSettings({
-    ispName: ispName.value,
-    logoUrl: logoUrl.value || DEFAULT_LOGO,
-    bkash: bkash.value,
-    nagad: nagad.value,
-    rocket: rocket.value
-  });
-  msg.innerText = "সেটিংস সেভ হয়েছে ✅";
-  renderCommon();
-}
-</script>
+  <div id="toast"></div>
+  <script src="script.js"></script>
 </body>
 </html>
