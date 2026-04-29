@@ -1,71 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-  <title>নতুন কাস্টমার - BFN ISP Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Customer | BFN ISP Billing Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<script src="script.js"></script>
-<script>protect();</script>
+<body data-page="add-customer">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-logo">BFN</div><div><h2>BFN ISP</h2><p>Billing Bangladesh</p></div></div>
+      <nav class="menu">
+        <a href="index.html">📊 ড্যাশবোর্ড</a>
+        <a href="customers.html">👥 কাস্টমার</a>
+        <a class="active" href="add-customer.html">➕ নতুন কাস্টমার</a>
+        <a href="bills.html">💳 বিলিং</a>
+        <a href="settings.html">⚙️ সেটিংস</a>
+        <button onclick="logout()">🚪 লগআউট</button>
+      </nav>
+    </aside>
 
-<div class="topbar">
-  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
-  <button class="btn btn-red" onclick="logout()">লগআউট</button>
-</div>
+    <main class="main">
+      <header class="topbar">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="search-box">🔎 <input type="text" placeholder="সার্চ করুন..." /></div>
+        <div class="top-actions"><span id="currentDate"></span><span class="bell">🔔</span><span class="profile-chip">👤 Admin</span></div>
+      </header>
 
-<div class="layout">
-  <div class="sidebar">
-    <a href="index.html">📊 ড্যাশবোর্ড</a>
-    <a href="customers.html">👥 কাস্টমার</a>
-    <a href="bills.html">💳 বিল</a>
-    <a href="settings.html">⚙️ সেটিংস</a>
+      <section class="page-head">
+        <div><h1>নতুন কাস্টমার যোগ করুন</h1><p>কাস্টমারের PPPoE / Billing প্রোফাইল তৈরি করুন</p></div>
+      </section>
+
+      <section class="panel form-panel">
+        <form id="addCustomerForm" class="modern-form">
+          <div class="form-grid">
+            <label>Full Name<input name="name" type="text" required placeholder="যেমন: Arif Hossain"></label>
+            <label>Mobile Number<input name="mobile" type="text" required placeholder="017xxxxxxxx"></label>
+            <label class="wide">Address<input name="address" type="text" required placeholder="Dhaka, Bangladesh"></label>
+            <label>Package/Profile
+              <select name="package" required>
+                <option value="">Select Package</option>
+                <option>10 Mbps</option>
+                <option>20 Mbps</option>
+                <option>30 Mbps</option>
+                <option>50 Mbps</option>
+                <option>Custom</option>
+              </select>
+            </label>
+            <label>Monthly Bill Amount<input name="bill" type="number" required placeholder="800"></label>
+            <label>Connection Date<input name="date" type="date" required></label>
+            <label>Status
+              <select name="status" required>
+                <option>Active</option>
+                <option>Disabled</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Save Customer</button>
+            <a class="btn btn-light" href="customers.html">Cancel</a>
+          </div>
+        </form>
+      </section>
+    </main>
   </div>
 
-  <div class="main">
-    <div class="box">
-      <h2>➕ নতুন কাস্টমার যোগ করুন</h2>
-
-      <div class="form-grid">
-        <input id="fullName" placeholder="পূর্ণ নাম">
-        <input id="mobile" placeholder="মোবাইল নাম্বার">
-        <input id="address" placeholder="ঠিকানা">
-        <input id="packageName" placeholder="প্যাকেজ / প্রোফাইল">
-        <input id="monthlyBill" type="number" placeholder="মাসিক বিল">
-        <input id="connectionDate" type="date">
-        <select id="status">
-          <option value="Active">Active</option>
-          <option value="Disabled">Disabled</option>
-        </select>
-      </div>
-
-      <button class="btn" onclick="saveCustomer()">সেভ করুন</button>
-      <a class="btn btn-blue" href="customers.html">ফিরে যান</a>
-    </div>
-  </div>
-</div>
-
-<script>
-renderCommon();
-
-function saveCustomer(){
-  const customers = getCustomers();
-  const id = Date.now();
-
-  customers.push({
-    id,
-    fullName: fullName.value,
-    mobile: mobile.value,
-    address: address.value,
-    packageName: packageName.value,
-    monthlyBill: Number(monthlyBill.value),
-    connectionDate: connectionDate.value,
-    status: status.value
-  });
-
-  saveCustomers(customers);
-  window.location.href = "customers.html";
-}
-</script>
+  <div id="toast"></div>
+  <script src="script.js"></script>
 </body>
 </html>
