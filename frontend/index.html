@@ -5,70 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-    }
-
-    .header {
-      background: #0f172a;
-      color: white;
-      padding: 18px;
-      text-align: center;
-    }
-
-    .nav {
-      background: white;
-      padding: 12px;
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      box-shadow: 0 2px 8px #ddd;
-    }
-
-    .nav a, .nav button {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      background: #2563eb;
-      color: white;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 450px;
-      margin: 25px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 4px 14px #ddd;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #16a34a;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-size: 15px;
-    }
-
-    #message {
-      text-align: center;
-      font-weight: bold;
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:#eef2f7;color:#111827}
+    .topbar{background:#0f172a;color:white;padding:15px 18px;display:flex;justify-content:space-between;align-items:center}
+    .brand{font-size:20px;font-weight:bold}
+    .logout{background:#ef4444;color:white;border:0;padding:9px 14px;border-radius:8px}
+    .layout{display:flex;min-height:100vh}
+    .sidebar{width:230px;background:#111827;color:white;padding:18px}
+    .sidebar h3{margin-top:0;color:#22c55e}
+    .sidebar a{display:block;color:white;text-decoration:none;padding:12px;border-radius:8px;margin:6px 0;background:#1f2937}
+    .sidebar a:hover{background:#2563eb}
+    .main{flex:1;padding:20px}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
+    .card{background:white;padding:18px;border-radius:14px;box-shadow:0 4px 12px #d1d5db}
+    .card h4{margin:0;color:#6b7280}
+    .card p{font-size:26px;font-weight:bold;margin:8px 0 0}
+    .form-box{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 12px #d1d5db;max-width:650px}
+    input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:8px}
+    .btn{background:#16a34a;color:white;border:0;padding:12px;border-radius:8px;width:100%;font-size:16px;margin-top:10px}
+    #message{font-weight:bold;text-align:center}
+    @media(max-width:800px){
+      .layout{display:block}
+      .sidebar{width:100%}
+      .cards{grid-template-columns:repeat(2,1fr)}
     }
   </style>
 </head>
@@ -76,38 +35,84 @@
 <body>
 
 <script>
-  if (!localStorage.getItem("token")) {
-    window.location.href = "login.html";
-  }
+if (!localStorage.getItem("token")) {
+  window.location.href = "login.html";
+}
 </script>
 
-<div class="header">
-  <h1>BFN ISP Billing</h1>
-  <p>Customer Billing Management System</p>
+<div class="topbar">
+  <div class="brand">🇧🇩 BFN ISP Billing</div>
+  <button class="logout" onclick="logout()">Logout</button>
 </div>
 
-<div class="nav">
-  <a href="customers.html">Customers</a>
-  <button onclick="logout()">Logout</button>
-</div>
+<div class="layout">
+  <div class="sidebar">
+    <h3>Admin Panel</h3>
+    <a href="index.html">📊 Dashboard</a>
+    <a href="customers.html">👥 Customers</a>
+    <a href="#">💳 Bills</a>
+    <a href="#">💰 Payments</a>
+    <a href="#">📡 MikroTik</a>
+    <a href="#">⚙️ Settings</a>
+  </div>
 
-<div class="container">
-  <h2>Add Customer</h2>
+  <div class="main">
+    <h2>Dashboard</h2>
 
-  <input id="full_name" placeholder="Full Name">
-  <input id="phone" placeholder="Phone Number">
-  <input id="address" placeholder="Address">
-  <input id="pppoe_username" placeholder="PPPoE Username">
-  <input id="package_name" placeholder="Package Name">
-  <input id="monthly_bill" placeholder="Monthly Bill">
+    <div class="cards">
+      <div class="card"><h4>Total Customers</h4><p id="totalCustomers">0</p></div>
+      <div class="card"><h4>Active Users</h4><p id="activeUsers">0</p></div>
+      <div class="card"><h4>Due Bills</h4><p id="dueBills">৳0</p></div>
+      <div class="card"><h4>Monthly Income</h4><p id="monthlyIncome">৳0</p></div>
+    </div>
 
-  <button onclick="addCustomer()">Add Customer</button>
+    <div class="form-box">
+      <h2>Add New Customer</h2>
 
-  <p id="message"></p>
+      <input id="full_name" placeholder="Customer Full Name">
+      <input id="phone" placeholder="Mobile Number">
+      <input id="address" placeholder="Address / Area">
+      <input id="pppoe_username" placeholder="PPPoE Username">
+
+      <select id="package_name">
+        <option value="">Select Package</option>
+        <option value="5 Mbps">5 Mbps</option>
+        <option value="10 Mbps">10 Mbps</option>
+        <option value="15 Mbps">15 Mbps</option>
+        <option value="20 Mbps">20 Mbps</option>
+      </select>
+
+      <input id="monthly_bill" placeholder="Monthly Bill Amount">
+
+      <button class="btn" onclick="addCustomer()">Add Customer</button>
+      <p id="message"></p>
+    </div>
+  </div>
 </div>
 
 <script>
 const API_URL = "https://bfn-isp-billing.onrender.com";
+
+async function loadStats() {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(API_URL + "/customers", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+
+  const data = await res.json();
+
+  if (Array.isArray(data)) {
+    document.getElementById("totalCustomers").innerText = data.length;
+    document.getElementById("activeUsers").innerText = data.filter(c => c.status !== "disabled").length;
+
+    let income = 0;
+    data.forEach(c => income += Number(c.monthly_bill || 0));
+
+    document.getElementById("monthlyIncome").innerText = "৳" + income;
+    document.getElementById("dueBills").innerText = "৳" + income;
+  }
+}
 
 async function addCustomer() {
   const token = localStorage.getItem("token");
@@ -134,6 +139,7 @@ async function addCustomer() {
 
   if (res.ok) {
     document.getElementById("message").innerText = "Customer added successfully ✅";
+    loadStats();
   } else {
     document.getElementById("message").innerText = "Error: " + (data.error || "Something went wrong");
   }
@@ -143,6 +149,8 @@ function logout() {
   localStorage.removeItem("token");
   window.location.href = "login.html";
 }
+
+loadStats();
 </script>
 
 </body>
