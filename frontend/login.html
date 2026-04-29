@@ -1,39 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-  <title>লগইন - BFN ISP Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | BFN ISP Billing Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="login-body">
+  <div class="login-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
 
-<div class="login-card">
-  <img class="logo isp-logo" src="">
-  <h2 class="isp-name">BFN ISP Billing Bangladesh</h2>
-  <p>এডমিন লগইন</p>
+    <div class="login-card animate-pop">
+      <div class="login-logo">
+        <span>BFN</span>
+      </div>
 
-  <input id="username" placeholder="ইউজারনেম">
-  <input id="password" type="password" placeholder="পাসওয়ার্ড">
+      <h1>BFN ISP Billing Bangladesh</h1>
+      <p>স্মার্ট আইএসপি বিলিং ম্যানেজমেন্ট</p>
 
-  <button class="btn btn-blue" onclick="login()">লগইন করুন</button>
-  <p id="error" class="msg"></p>
-</div>
+      <form id="loginForm" class="login-form">
+        <div class="input-group">
+          <span>👤</span>
+          <input type="text" id="loginUsername" placeholder="ইউজারনেম" autocomplete="username" required />
+        </div>
 
-<script src="script.js"></script>
-<script>
-renderCommon();
+        <div class="input-group">
+          <span>🔐</span>
+          <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" autocomplete="current-password" required />
+        </div>
 
-function login(){
-  const u = document.getElementById("username").value;
-  const p = document.getElementById("password").value;
+        <div id="loginError" class="login-error"></div>
 
-  if(u === "admin" && p === "1234"){
-    localStorage.setItem("loggedIn","true");
-    window.location.href = "index.html";
-  }else{
-    document.getElementById("error").innerText = "ভুল ইউজারনেম অথবা পাসওয়ার্ড ❌";
-  }
-}
-</script>
+        <button type="submit" class="btn btn-primary full">লগইন করুন</button>
+      </form>
+
+      <div class="login-demo">
+        Demo: <b>admin</b> / <b>1234</b>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
