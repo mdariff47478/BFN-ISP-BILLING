@@ -9,7 +9,6 @@
       margin:0;
       font-family:Arial;
       background:linear-gradient(135deg,#0f172a,#1e293b);
-      color:white;
       display:flex;
       justify-content:center;
       align-items:center;
@@ -18,12 +17,11 @@
 
     .login-box{
       background:white;
-      color:black;
-      padding:25px;
+      padding:30px;
       border-radius:16px;
       width:320px;
-      box-shadow:0 8px 30px rgba(0,0,0,0.3);
       text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.3);
     }
 
     .logo{
@@ -37,6 +35,7 @@
 
     h2{
       margin:10px 0;
+      color:#111827;
     }
 
     input{
@@ -58,10 +57,10 @@
       font-size:15px;
     }
 
-    .upload{
+    #msg{
       margin-top:10px;
-      font-size:13px;
-      color:#555;
+      color:red;
+      font-size:14px;
     }
   </style>
 </head>
@@ -71,8 +70,6 @@
 <div class="login-box">
 
   <img id="logoPreview" class="logo" src="https://via.placeholder.com/90">
-
-  <input type="file" onchange="loadLogo(event)" class="upload">
 
   <h2>BFN ISP Billing</h2>
 
@@ -88,18 +85,8 @@
 <script>
 const API = "https://bfn-isp-billing.onrender.com";
 
-// 🔥 Logo upload (local storage)
-function loadLogo(event) {
-  const reader = new FileReader();
-  reader.onload = function(){
-    document.getElementById("logoPreview").src = reader.result;
-    localStorage.setItem("logo", reader.result);
-  }
-  reader.readAsDataURL(event.target.files[0]);
-}
-
-// Load saved logo
-const savedLogo = localStorage.getItem("logo");
+// 🔥 Settings থেকে logo load
+const savedLogo = localStorage.getItem("site_logo");
 if (savedLogo) {
   document.getElementById("logoPreview").src = savedLogo;
 }
@@ -121,7 +108,7 @@ async function login() {
     localStorage.setItem("token", data.token);
     window.location.href = "index.html";
   } else {
-    document.getElementById("msg").innerText = "Login Failed ❌";
+    document.getElementById("msg").innerText = "Invalid Username or Password ❌";
   }
 }
 </script>
