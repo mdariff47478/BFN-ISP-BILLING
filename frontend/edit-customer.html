@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>কাস্টমার এডিট - BFN ISP Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script src="script.js"></script>
+<script>protect();</script>
+
+<div class="topbar">
+  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
+  <button class="btn btn-red" onclick="logout()">লগআউট</button>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <a href="index.html">📊 ড্যাশবোর্ড</a>
+    <a href="customers.html">👥 কাস্টমার</a>
+    <a href="bills.html">💳 বিল</a>
+    <a href="settings.html">⚙️ সেটিংস</a>
+  </div>
+
+  <div class="main">
+    <div class="box">
+      <h2>✏️ কাস্টমার এডিট</h2>
+
+      <div class="form-grid">
+        <input id="fullName" placeholder="পূর্ণ নাম">
+        <input id="mobile" placeholder="মোবাইল নাম্বার">
+        <input id="address" placeholder="ঠিকানা">
+        <input id="packageName" placeholder="প্যাকেজ">
+        <input id="monthlyBill" type="number" placeholder="মাসিক বিল">
+        <input id="connectionDate" type="date">
+        <select id="status">
+          <option value="Active">Active</option>
+          <option value="Disabled">Disabled</option>
+        </select>
+      </div>
+
+      <button class="btn btn-blue" onclick="updateCustomer()">আপডেট করুন</button>
+      <a class="btn" href="customers.html">ফিরে যান</a>
+    </div>
+  </div>
+</div>
+
+<script>
+renderCommon();
+
+const id = new URLSearchParams(location.search).get("id");
+const customers = getCustomers();
+const c = customers.find(x => x.id == id);
+
+if(c){
+  fullName.value = c.fullName;
+  mobile.value = c.mobile;
+  address.value = c.address;
+  packageName.value = c.packageName;
+  monthlyBill.value = c.monthlyBill;
+  connectionDate.value = c.connectionDate;
+  status.value = c.status;
+}
+
+function updateCustomer(){
+  const index = customers.findIndex(x => x.id == id);
+  customers[index] = {
+    id:Number(id),
+    fullName:fullName.value,
+    mobile:mobile.value,
+    address:address.value,
+    packageName:packageName.value,
+    monthlyBill:Number(monthlyBill.value),
+    connectionDate:connectionDate.value,
+    status:status.value
+  };
+  saveCustomers(customers);
+  window.location.href = "customers.html";
+}
+</script>
+</body>
+</html>
