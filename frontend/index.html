@@ -1,88 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-  <title>ড্যাশবোর্ড - BFN ISP Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | BFN ISP Billing Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<script src="script.js"></script>
-<script>protect();</script>
+<body data-page="dashboard">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">BFN</div>
+        <div>
+          <h2>BFN ISP</h2>
+          <p>Billing Bangladesh</p>
+        </div>
+      </div>
 
-<div class="topbar">
-  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
-  <button class="btn btn-red" onclick="logout()">লগআউট</button>
-</div>
+      <nav class="menu">
+        <a class="active" href="index.html">📊 ড্যাশবোর্ড</a>
+        <a href="customers.html">👥 কাস্টমার</a>
+        <a href="add-customer.html">➕ নতুন কাস্টমার</a>
+        <a href="bills.html">💳 বিলিং</a>
+        <a href="settings.html">⚙️ সেটিংস</a>
+        <button onclick="logout()">🚪 লগআউট</button>
+      </nav>
+    </aside>
 
-<div class="layout">
-  <div class="sidebar">
-    <a href="index.html">📊 ড্যাশবোর্ড</a>
-    <a href="customers.html">👥 কাস্টমার</a>
-    <a href="bills.html">💳 বিল</a>
-    <a href="settings.html">⚙️ সেটিংস</a>
-    <a href="#" onclick="logout()">🚪 লগআউট</a>
+    <main class="main">
+      <header class="topbar">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="search-box">🔎 <input id="globalSearch" type="text" placeholder="সার্চ করুন..." /></div>
+        <div class="top-actions">
+          <span class="date-pill" id="currentDate"></span>
+          <span class="bell">🔔</span>
+          <span class="profile-chip">👤 Admin</span>
+        </div>
+      </header>
+
+      <section class="page-head">
+        <div>
+          <h1>ড্যাশবোর্ড</h1>
+          <p>আপনার আইএসপি বিলিং সিস্টেমের লাইভ ওভারভিউ</p>
+        </div>
+        <a href="add-customer.html" class="btn btn-primary">+ নতুন কাস্টমার</a>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card green">
+          <span class="stat-icon">👥</span>
+          <p>মোট কাস্টমার</p>
+          <h2 id="totalCustomers">0</h2>
+          <small>এই মাসে বৃদ্ধি</small>
+        </div>
+        <div class="stat-card cyan">
+          <span class="stat-icon">🟢</span>
+          <p>একটিভ ইউজার</p>
+          <h2 id="activeUsers">0</h2>
+          <small>লাইভ কানেকশন</small>
+        </div>
+        <div class="stat-card red">
+          <span class="stat-icon">⚠️</span>
+          <p>বকেয়া টাকা</p>
+          <h2 id="dueAmount">৳0</h2>
+          <small>আনপেইড বিল</small>
+        </div>
+        <div class="stat-card blue">
+          <span class="stat-icon">💰</span>
+          <p>মাসিক কালেকশন</p>
+          <h2 id="monthlyCollection">৳0</h2>
+          <small>পেইড এমাউন্ট</small>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <div class="panel large">
+          <div class="panel-head">
+            <h3>Recent Customers</h3>
+            <a href="customers.html">সব দেখুন</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th><th>নাম</th><th>মোবাইল</th><th>প্যাকেজ</th><th>স্ট্যাটাস</th>
+                </tr>
+              </thead>
+              <tbody id="recentCustomersTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Quick Actions</h3>
+          </div>
+          <div class="quick-actions">
+            <a href="add-customer.html">➕ কাস্টমার যোগ করুন</a>
+            <a href="bills.html">🧾 বিল জেনারেট</a>
+            <a href="settings.html">⚙️ সেটিংস আপডেট</a>
+            <button onclick="generateCurrentMonthBills()">⚡ মাসিক বিল তৈরি</button>
+          </div>
+        </div>
+
+        <div class="panel large">
+          <div class="panel-head">
+            <h3>Due Bills</h3>
+            <a href="bills.html">বিলিং পেজ</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>কাস্টমার</th><th>মাস</th><th>এমাউন্ট</th><th>বকেয়া</th><th>স্ট্যাটাস</th>
+                </tr>
+              </thead>
+              <tbody id="dueBillsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel notice">
+          <div class="panel-head">
+            <h3>ISP Notice</h3>
+          </div>
+          <h2>📢 সার্ভিস নোটিশ</h2>
+          <p>মাসের ১০ তারিখের মধ্যে বিল পরিশোধ করুন। বকেয়া থাকলে কানেকশন সাময়িকভাবে বন্ধ হতে পারে।</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Monthly Collection Overview</h3>
+        </div>
+        <div class="collection-bars" id="collectionOverview"></div>
+      </section>
+    </main>
   </div>
 
-  <div class="main">
-    <h2>🇧🇩 বাংলাদেশী ISP বিলিং ড্যাশবোর্ড</h2>
-
-    <div class="cards">
-      <div class="card"><h4>মোট কাস্টমার</h4><p id="total">0</p></div>
-      <div class="card"><h4>Active</h4><p id="active">0</p></div>
-      <div class="card"><h4>Disabled</h4><p id="disabled">0</p></div>
-      <div class="card"><h4>মোট বকেয়া</h4><p id="due">৳0</p></div>
-      <div class="card"><h4>মাসিক কালেকশন</h4><p id="collection">৳0</p></div>
-    </div>
-
-    <div class="box">
-      <h3>Recent Customers</h3>
-      <table>
-        <thead><tr><th>নাম</th><th>মোবাইল</th><th>প্যাকেজ</th><th>স্ট্যাটাস</th></tr></thead>
-        <tbody id="recentCustomers"></tbody>
-      </table>
-    </div>
-
-    <div class="box">
-      <h3>Due Bills</h3>
-      <table>
-        <thead><tr><th>কাস্টমার</th><th>মাস</th><th>বিল</th><th>Due</th></tr></thead>
-        <tbody id="dueBills"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<script>
-renderCommon();
-
-const customers = getCustomers();
-const bills = getBills();
-
-document.getElementById("total").innerText = customers.length;
-document.getElementById("active").innerText = customers.filter(c=>c.status==="Active").length;
-document.getElementById("disabled").innerText = customers.filter(c=>c.status==="Disabled").length;
-
-let due = 0, collection = 0;
-bills.forEach(b=>{
-  const d = Number(b.amount) - Number(b.paidAmount || 0);
-  if(b.status !== "Paid") due += d;
-  collection += Number(b.paidAmount || 0);
-});
-document.getElementById("due").innerText = money(due);
-document.getElementById("collection").innerText = money(collection);
-
-document.getElementById("recentCustomers").innerHTML = customers.slice(-5).reverse().map(c=>`
-<tr>
-<td>${c.fullName}</td><td>${c.mobile}</td><td>${c.packageName}</td>
-<td><span class="badge ${c.status==="Active"?"active":"disabled"}">${c.status}</span></td>
-</tr>
-`).join("");
-
-document.getElementById("dueBills").innerHTML = bills.filter(b=>b.status!=="Paid").slice(-5).reverse().map(b=>{
-  const c = customers.find(x=>x.id==b.customerId) || {};
-  const d = Number(b.amount)-Number(b.paidAmount||0);
-  return `<tr><td>${c.fullName||"N/A"}</td><td>${b.month}</td><td>${money(b.amount)}</td><td>${money(d)}</td></tr>`;
-}).join("");
-</script>
+  <div id="toast"></div>
+  <script src="script.js"></script>
 </body>
 </html>
