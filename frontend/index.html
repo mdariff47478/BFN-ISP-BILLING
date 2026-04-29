@@ -1,29 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>BFN ISP Billing</title>
+  <title>Dashboard - BFN ISP Billing</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,sans-serif;background:#eef2f7;color:#111827}
-    .topbar{background:#0f172a;color:white;padding:15px 18px;display:flex;justify-content:space-between;align-items:center}
-    .brand{font-size:20px;font-weight:bold}
-    .logout{background:#ef4444;color:white;border:0;padding:9px 14px;border-radius:8px}
-    .layout{display:flex;min-height:100vh}
-    .sidebar{width:230px;background:#111827;color:white;padding:18px}
-    .sidebar h3{margin-top:0;color:#22c55e}
-    .sidebar a{display:block;color:white;text-decoration:none;padding:12px;border-radius:8px;margin:6px 0;background:#1f2937}
-    .sidebar a:hover{background:#2563eb}
-    .main{flex:1;padding:20px}
-    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
-    .card{background:white;padding:18px;border-radius:14px;box-shadow:0 4px 12px #d1d5db}
-    .card h4{margin:0;color:#6b7280}
-    .card p{font-size:26px;font-weight:bold;margin:8px 0 0}
-    .form-box{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 12px #d1d5db;max-width:650px}
-    input,select{width:100%;padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:8px}
-    .btn{background:#16a34a;color:white;border:0;padding:12px;border-radius:8px;width:100%;font-size:16px;margin-top:10px}
-    #message{font-weight:bold;text-align:center}
+    body{margin:0;font-family:Arial;background:#eef2f7}
+
+    .topbar{
+      background:#0f172a;
+      color:white;
+      padding:15px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .brand{
+      font-size:18px;
+      font-weight:bold;
+    }
+
+    .logout{
+      background:#ef4444;
+      border:0;
+      color:white;
+      padding:8px 14px;
+      border-radius:8px;
+    }
+
+    .layout{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:230px;
+      background:#111827;
+      color:white;
+      padding:15px;
+    }
+
+    .sidebar h3{
+      color:#22c55e;
+    }
+
+    .sidebar a{
+      display:block;
+      color:white;
+      text-decoration:none;
+      padding:12px;
+      border-radius:8px;
+      margin:6px 0;
+      background:#1f2937;
+    }
+
+    .sidebar a:hover{
+      background:#2563eb;
+    }
+
+    .main{
+      flex:1;
+      padding:20px;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:15px;
+      margin-bottom:20px;
+    }
+
+    .card{
+      background:white;
+      padding:18px;
+      border-radius:14px;
+      box-shadow:0 4px 12px #d1d5db;
+    }
+
+    .card h4{
+      margin:0;
+      color:#6b7280;
+    }
+
+    .card p{
+      font-size:26px;
+      font-weight:bold;
+      margin:8px 0 0;
+    }
+
+    .welcome-box{
+      background:white;
+      padding:25px;
+      border-radius:14px;
+      box-shadow:0 4px 12px #d1d5db;
+    }
+
+    .btn{
+      display:block;
+      margin-top:10px;
+      padding:12px;
+      text-align:center;
+      border-radius:8px;
+      text-decoration:none;
+      color:white;
+    }
+
+    .green{background:#16a34a}
+    .blue{background:#2563eb}
+    .orange{background:#f59e0b}
+
     @media(max-width:800px){
       .layout{display:block}
       .sidebar{width:100%}
@@ -46,6 +133,7 @@ if (!localStorage.getItem("token")) {
 </div>
 
 <div class="layout">
+
   <div class="sidebar">
     <h3>Admin Panel</h3>
     <a href="index.html">📊 Dashboard</a>
@@ -53,10 +141,11 @@ if (!localStorage.getItem("token")) {
     <a href="#">💳 Bills</a>
     <a href="#">💰 Payments</a>
     <a href="#">📡 MikroTik</a>
-    <a href="#">⚙️ Settings</a>
+    <a href="settings.html">⚙️ Settings</a>
   </div>
 
   <div class="main">
+
     <h2>Dashboard</h2>
 
     <div class="cards">
@@ -66,37 +155,26 @@ if (!localStorage.getItem("token")) {
       <div class="card"><h4>Monthly Income</h4><p id="monthlyIncome">৳0</p></div>
     </div>
 
-    <div class="form-box">
-      <h2>Add New Customer</h2>
+    <div class="welcome-box">
+      <h2>🇧🇩 Bangladeshi ISP Billing System</h2>
+      <p>Welcome to your ISP Management Dashboard</p>
 
-      <input id="full_name" placeholder="Customer Full Name">
-      <input id="phone" placeholder="Mobile Number">
-      <input id="address" placeholder="Address / Area">
-      <input id="pppoe_username" placeholder="PPPoE Username">
-
-      <select id="package_name">
-        <option value="">Select Package</option>
-        <option value="5 Mbps">5 Mbps</option>
-        <option value="10 Mbps">10 Mbps</option>
-        <option value="15 Mbps">15 Mbps</option>
-        <option value="20 Mbps">20 Mbps</option>
-      </select>
-
-      <input id="monthly_bill" placeholder="Monthly Bill Amount">
-
-      <button class="btn" onclick="addCustomer()">Add Customer</button>
-      <p id="message"></p>
+      <a href="customers.html" class="btn green">👥 Manage Customers</a>
+      <a href="#" class="btn blue">💳 Billing System</a>
+      <a href="#" class="btn orange">📡 MikroTik Control</a>
     </div>
+
   </div>
+
 </div>
 
 <script>
-const API_URL = "https://bfn-isp-billing.onrender.com";
+const API = "https://bfn-isp-billing.onrender.com";
 
 async function loadStats() {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(API_URL + "/customers", {
+  const res = await fetch(API + "/customers", {
     headers: { "Authorization": "Bearer " + token }
   });
 
@@ -104,44 +182,14 @@ async function loadStats() {
 
   if (Array.isArray(data)) {
     document.getElementById("totalCustomers").innerText = data.length;
-    document.getElementById("activeUsers").innerText = data.filter(c => c.status !== "disabled").length;
+    document.getElementById("activeUsers").innerText =
+      data.filter(c => c.status !== "disabled").length;
 
     let income = 0;
     data.forEach(c => income += Number(c.monthly_bill || 0));
 
     document.getElementById("monthlyIncome").innerText = "৳" + income;
     document.getElementById("dueBills").innerText = "৳" + income;
-  }
-}
-
-async function addCustomer() {
-  const token = localStorage.getItem("token");
-
-  const customer = {
-    full_name: document.getElementById("full_name").value,
-    phone: document.getElementById("phone").value,
-    address: document.getElementById("address").value,
-    pppoe_username: document.getElementById("pppoe_username").value,
-    package_name: document.getElementById("package_name").value,
-    monthly_bill: Number(document.getElementById("monthly_bill").value)
-  };
-
-  const res = await fetch(API_URL + "/customers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify(customer)
-  });
-
-  const data = await res.json();
-
-  if (res.ok) {
-    document.getElementById("message").innerText = "Customer added successfully ✅";
-    loadStats();
-  } else {
-    document.getElementById("message").innerText = "Error: " + (data.error || "Something went wrong");
   }
 }
 
