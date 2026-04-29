@@ -5,7 +5,17 @@
 </head>
 <body>
 
+<script>
+  if (!localStorage.getItem("token")) {
+    window.location.href = "login.html";
+  }
+</script>
+
 <h1>All Customers</h1>
+
+<a href="index.html">Add Customer</a>
+<button onclick="logout()">Logout</button>
+<br><br>
 
 <table border="1">
   <thead>
@@ -19,12 +29,26 @@
   <tbody id="customerTable"></tbody>
 </table>
 
+<p id="message"></p>
+
 <script>
 const API_URL = "https://bfn-isp-billing.onrender.com";
 
 async function loadCustomers() {
-  const res = await fetch(API_URL + "/customers");
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(API_URL + "/customers", {
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  });
+
   const data = await res.json();
+
+  if (!res.ok) {
+    document.getElementById("message").innerText = "Error: " + (data.error || "Login again");
+    return;
+  }
 
   let html = "";
 
@@ -40,6 +64,11 @@ async function loadCustomers() {
   });
 
   document.getElementById("customerTable").innerHTML = html;
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
 }
 
 loadCustomers();
