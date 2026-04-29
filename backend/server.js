@@ -90,3 +90,39 @@ app.get("/customers", verifyToken, async (req, res) => {
 });
 
 app.listen(10000, () => console.log("Server running"));
+
+// GET bills
+app.get("/bills", verifyToken, async (req, res) => {
+  const { data, error } = await supabase
+    .from("bills")
+    .select("*, customers(full_name, phone)");
+
+  if (error) return res.status(400).json({ error });
+  res.json(data);
+});
+
+// CREATE bill
+app.post("/bills", verifyToken, async (req, res) => {
+  const { customer_id, month, amount } = req.body;
+
+  const { data, error } = await supabase
+    .from("bills")
+    .insert([{ customer_id, month, amount, status: "unpaid" }])
+    .select();
+
+  if (error) return res.status(400).json({ error });
+  res.json(data[0]);
+});
+
+// MARK PAID
+app.put("/bills/:id/paid", verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  const { error } = await supabase
+    .from("bills")
+    .update({ status: "paid", paid_amount: req.body.paid_amount })
+    .eq("id", id);
+
+  if (error) return res.status(400).json({ error });
+  res.json({ success: true });
+});
