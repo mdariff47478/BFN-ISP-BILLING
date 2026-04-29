@@ -1,85 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-  <title>কাস্টমার - BFN ISP Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customers | BFN ISP Billing Bangladesh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<script src="script.js"></script>
-<script>protect();</script>
+<body data-page="customers">
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="brand-logo">BFN</div><div><h2>BFN ISP</h2><p>Billing Bangladesh</p></div></div>
+      <nav class="menu">
+        <a href="index.html">📊 ড্যাশবোর্ড</a>
+        <a class="active" href="customers.html">👥 কাস্টমার</a>
+        <a href="add-customer.html">➕ নতুন কাস্টমার</a>
+        <a href="bills.html">💳 বিলিং</a>
+        <a href="settings.html">⚙️ সেটিংস</a>
+        <button onclick="logout()">🚪 লগআউট</button>
+      </nav>
+    </aside>
 
-<div class="topbar">
-  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
-  <button class="btn btn-red" onclick="logout()">লগআউট</button>
-</div>
+    <main class="main">
+      <header class="topbar">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <div class="search-box">🔎 <input id="customerSearch" type="text" placeholder="কাস্টমার সার্চ করুন..." /></div>
+        <div class="top-actions"><span id="currentDate"></span><span class="bell">🔔</span><span class="profile-chip">👤 Admin</span></div>
+      </header>
 
-<div class="layout">
-  <div class="sidebar">
-    <a href="index.html">📊 ড্যাশবোর্ড</a>
-    <a href="customers.html">👥 কাস্টমার</a>
-    <a href="bills.html">💳 বিল</a>
-    <a href="settings.html">⚙️ সেটিংস</a>
-    <a href="#" onclick="logout()">🚪 লগআউট</a>
+      <section class="page-head">
+        <div><h1>কাস্টমার ম্যানেজমেন্ট</h1><p>সব কাস্টমার দেখুন, এডিট করুন বা স্ট্যাটাস পরিবর্তন করুন</p></div>
+        <a href="add-customer.html" class="btn btn-primary">+ Add Customer</a>
+      </section>
+
+      <section class="panel">
+        <div class="filters">
+          <button class="pill active" data-filter="All">সব</button>
+          <button class="pill" data-filter="Active">Active</button>
+          <button class="pill" data-filter="Disabled">Disabled</button>
+        </div>
+
+        <div class="table-wrap desktop-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>নাম</th><th>মোবাইল</th><th>ঠিকানা</th><th>প্যাকেজ</th><th>বিল</th><th>স্ট্যাটাস</th><th>তারিখ</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="customersTable"></tbody>
+          </table>
+        </div>
+
+        <div id="customerMobileCards" class="mobile-cards"></div>
+      </section>
+    </main>
   </div>
 
-  <div class="main">
-    <div class="search-row">
-      <h2>কাস্টমার লিস্ট</h2>
-      <a class="btn" href="add-customer.html">➕ নতুন কাস্টমার</a>
-    </div>
-
-    <input id="search" onkeyup="loadCustomers()" placeholder="নাম বা মোবাইল দিয়ে সার্চ করুন">
-
-    <div class="box">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th><th>নাম</th><th>মোবাইল</th><th>ঠিকানা</th><th>প্যাকেজ</th>
-            <th>মাসিক বিল</th><th>তারিখ</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th>
-          </tr>
-        </thead>
-        <tbody id="table"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<script>
-renderCommon();
-
-function loadCustomers(){
-  const q = document.getElementById("search").value.toLowerCase();
-  let customers = getCustomers().filter(c =>
-    c.fullName.toLowerCase().includes(q) || c.mobile.toLowerCase().includes(q)
-  );
-
-  document.getElementById("table").innerHTML = customers.map(c=>`
-    <tr>
-      <td>${c.id}</td>
-      <td>${c.fullName}</td>
-      <td>${c.mobile}</td>
-      <td>${c.address}</td>
-      <td>${c.packageName}</td>
-      <td>${money(c.monthlyBill)}</td>
-      <td>${c.connectionDate}</td>
-      <td><span class="badge ${c.status==="Active"?"active":"disabled"}">${c.status}</span></td>
-      <td>
-        <a class="btn btn-blue" href="edit-customer.html?id=${c.id}">Edit</a>
-        <button class="btn btn-red" onclick="deleteCustomer(${c.id})">Delete</button>
-      </td>
-    </tr>
-  `).join("");
-}
-
-function deleteCustomer(id){
-  if(confirm("এই কাস্টমার ডিলিট করবেন?")){
-    saveCustomers(getCustomers().filter(c=>c.id != id));
-    loadCustomers();
-  }
-}
-
-loadCustomers();
-</script>
+  <div id="toast"></div>
+  <script src="script.js"></script>
 </body>
 </html>
