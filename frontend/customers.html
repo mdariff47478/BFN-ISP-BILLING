@@ -1,110 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Customers</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body{margin:0;font-family:Arial;background:#eef2f7}
-.topbar{background:#0f172a;color:white;padding:15px;display:flex;justify-content:space-between}
-.layout{display:flex}
-.sidebar{width:220px;background:#111827;color:white;padding:15px}
-.sidebar a{display:block;color:white;padding:12px;margin:5px 0;background:#1f2937;text-decoration:none;border-radius:8px}
-.main{flex:1;padding:20px}
-table{width:100%;background:white;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #eee}
-button{padding:6px 10px;border:none;border-radius:6px}
-.delete{background:red;color:white}
-.edit{background:blue;color:white}
-</style>
+  <title>কাস্টমার - BFN ISP Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
-<script>
-if(!localStorage.getItem("token")) location.href="login.html";
-</script>
+<script src="script.js"></script>
+<script>protect();</script>
 
 <div class="topbar">
-<b>🇧🇩 BFN ISP Billing</b>
-<button onclick="logout()">Logout</button>
+  <div class="brand"><img class="isp-logo"><span class="isp-name"></span></div>
+  <button class="btn btn-red" onclick="logout()">লগআউট</button>
 </div>
 
 <div class="layout">
+  <div class="sidebar">
+    <a href="index.html">📊 ড্যাশবোর্ড</a>
+    <a href="customers.html">👥 কাস্টমার</a>
+    <a href="bills.html">💳 বিল</a>
+    <a href="settings.html">⚙️ সেটিংস</a>
+    <a href="#" onclick="logout()">🚪 লগআউট</a>
+  </div>
 
-<div class="sidebar">
-<a href="index.html">📊 Dashboard</a>
-<a href="customers.html">👥 Customers</a>
-<a href="bills.html">💳 Bills</a>
-<a href="settings.html">⚙️ Settings</a>
-</div>
+  <div class="main">
+    <div class="search-row">
+      <h2>কাস্টমার লিস্ট</h2>
+      <a class="btn" href="add-customer.html">➕ নতুন কাস্টমার</a>
+    </div>
 
-<div class="main">
+    <input id="search" onkeyup="loadCustomers()" placeholder="নাম বা মোবাইল দিয়ে সার্চ করুন">
 
-<h2>Customers</h2>
-
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Phone</th>
-<th>Package</th>
-<th>Bill</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody id="table"></tbody>
-</table>
-
-</div>
-
+    <div class="box">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>নাম</th><th>মোবাইল</th><th>ঠিকানা</th><th>প্যাকেজ</th>
+            <th>মাসিক বিল</th><th>তারিখ</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody id="table"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-const API="https://bfn-isp-billing.onrender.com";
-const token=localStorage.getItem("token");
+renderCommon();
 
-async function load(){
-const res=await fetch(API+"/customers",{headers:{Authorization:"Bearer "+token}});
-const data=await res.json();
+function loadCustomers(){
+  const q = document.getElementById("search").value.toLowerCase();
+  let customers = getCustomers().filter(c =>
+    c.fullName.toLowerCase().includes(q) || c.mobile.toLowerCase().includes(q)
+  );
 
-let html="";
-data.forEach(c=>{
-html+=`
-<tr>
-<td>${c.full_name}</td>
-<td>${c.phone}</td>
-<td>${c.package_name}</td>
-<td>${c.monthly_bill}</td>
-<td>
-<button class="edit" onclick="edit(${c.id})">Edit</button>
-<button class="delete" onclick="del(${c.id})">Delete</button>
-</td>
-</tr>
-`;
-});
-
-document.getElementById("table").innerHTML=html;
+  document.getElementById("table").innerHTML = customers.map(c=>`
+    <tr>
+      <td>${c.id}</td>
+      <td>${c.fullName}</td>
+      <td>${c.mobile}</td>
+      <td>${c.address}</td>
+      <td>${c.packageName}</td>
+      <td>${money(c.monthlyBill)}</td>
+      <td>${c.connectionDate}</td>
+      <td><span class="badge ${c.status==="Active"?"active":"disabled"}">${c.status}</span></td>
+      <td>
+        <a class="btn btn-blue" href="edit-customer.html?id=${c.id}">Edit</a>
+        <button class="btn btn-red" onclick="deleteCustomer(${c.id})">Delete</button>
+      </td>
+    </tr>
+  `).join("");
 }
 
-function edit(id){
-location.href="edit.html?id="+id;
+function deleteCustomer(id){
+  if(confirm("এই কাস্টমার ডিলিট করবেন?")){
+    saveCustomers(getCustomers().filter(c=>c.id != id));
+    loadCustomers();
+  }
 }
 
-async function del(id){
-await fetch(API+"/customers/"+id,{
-method:"DELETE",
-headers:{Authorization:"Bearer "+token}
-});
-load();
-}
-
-function logout(){
-localStorage.removeItem("token");
-location.href="login.html";
-}
-
-load();
+loadCustomers();
 </script>
-
 </body>
 </html>
