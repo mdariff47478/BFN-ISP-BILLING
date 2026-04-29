@@ -1,204 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard - BFN ISP Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Arial;background:#eef2f7}
-
-    .topbar{
-      background:#0f172a;
-      color:white;
-      padding:15px 18px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    .brand{
-      font-size:18px;
-      font-weight:bold;
-    }
-
-    .logout{
-      background:#ef4444;
-      border:0;
-      color:white;
-      padding:8px 14px;
-      border-radius:8px;
-    }
-
-    .layout{
-      display:flex;
-      min-height:100vh;
-    }
-
-    .sidebar{
-      width:230px;
-      background:#111827;
-      color:white;
-      padding:15px;
-    }
-
-    .sidebar h3{
-      color:#22c55e;
-    }
-
-    .sidebar a{
-      display:block;
-      color:white;
-      text-decoration:none;
-      padding:12px;
-      border-radius:8px;
-      margin:6px 0;
-      background:#1f2937;
-    }
-
-    .sidebar a:hover{
-      background:#2563eb;
-    }
-
-    .main{
-      flex:1;
-      padding:20px;
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:15px;
-      margin-bottom:20px;
-    }
-
-    .card{
-      background:white;
-      padding:18px;
-      border-radius:14px;
-      box-shadow:0 4px 12px #d1d5db;
-    }
-
-    .card h4{
-      margin:0;
-      color:#6b7280;
-    }
-
-    .card p{
-      font-size:26px;
-      font-weight:bold;
-      margin:8px 0 0;
-    }
-
-    .welcome-box{
-      background:white;
-      padding:25px;
-      border-radius:14px;
-      box-shadow:0 4px 12px #d1d5db;
-    }
-
-    .btn{
-      display:block;
-      margin-top:10px;
-      padding:12px;
-      text-align:center;
-      border-radius:8px;
-      text-decoration:none;
-      color:white;
-    }
-
-    .green{background:#16a34a}
-    .blue{background:#2563eb}
-    .orange{background:#f59e0b}
-
-    @media(max-width:800px){
-      .layout{display:block}
-      .sidebar{width:100%}
-      .cards{grid-template-columns:repeat(2,1fr)}
-    }
-  </style>
+<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:Arial;background:#eef2f7}
+.topbar{background:#0f172a;color:white;padding:15px;display:flex;justify-content:space-between}
+.layout{display:flex}
+.sidebar{width:220px;background:#111827;color:white;padding:15px}
+.sidebar a{display:block;color:white;padding:12px;margin:5px 0;background:#1f2937;text-decoration:none;border-radius:8px}
+.main{flex:1;padding:20px}
+.card{background:white;padding:15px;border-radius:10px;margin:10px 0}
+</style>
 </head>
 
 <body>
 
 <script>
-if (!localStorage.getItem("token")) {
-  window.location.href = "login.html";
-}
+if(!localStorage.getItem("token")) location.href="login.html";
 </script>
 
 <div class="topbar">
-  <div class="brand">🇧🇩 BFN ISP Billing</div>
-  <button class="logout" onclick="logout()">Logout</button>
+<b>🇧🇩 BFN ISP Billing</b>
+<button onclick="logout()">Logout</button>
 </div>
 
 <div class="layout">
 
-  <div class="sidebar">
-    <h3>Admin Panel</h3>
-    <a href="index.html">📊 Dashboard</a>
-    <a href="customers.html">👥 Customers</a>
-    <a href="#">💳 Bills</a>
-    <a href="#">💰 Payments</a>
-    <a href="#">📡 MikroTik</a>
-    <a href="settings.html">⚙️ Settings</a>
-  </div>
+<div class="sidebar">
+<a href="index.html">📊 Dashboard</a>
+<a href="customers.html">👥 Customers</a>
+<a href="bills.html">💳 Bills</a>
+<a href="settings.html">⚙️ Settings</a>
+</div>
 
-  <div class="main">
+<div class="main">
+<h2>Dashboard</h2>
 
-    <h2>Dashboard</h2>
+<div class="card">Total Customers: <span id="total">0</span></div>
+<div class="card">Monthly Income: ৳<span id="income">0</span></div>
 
-    <div class="cards">
-      <div class="card"><h4>Total Customers</h4><p id="totalCustomers">0</p></div>
-      <div class="card"><h4>Active Users</h4><p id="activeUsers">0</p></div>
-      <div class="card"><h4>Due Bills</h4><p id="dueBills">৳0</p></div>
-      <div class="card"><h4>Monthly Income</h4><p id="monthlyIncome">৳0</p></div>
-    </div>
-
-    <div class="welcome-box">
-      <h2>🇧🇩 Bangladeshi ISP Billing System</h2>
-      <p>Welcome to your ISP Management Dashboard</p>
-
-      <a href="customers.html" class="btn green">👥 Manage Customers</a>
-      <a href="#" class="btn blue">💳 Billing System</a>
-      <a href="#" class="btn orange">📡 MikroTik Control</a>
-    </div>
-
-  </div>
+</div>
 
 </div>
 
 <script>
-const API = "https://bfn-isp-billing.onrender.com";
+const API="https://bfn-isp-billing.onrender.com";
+const token=localStorage.getItem("token");
 
-async function loadStats() {
-  const token = localStorage.getItem("token");
+async function load(){
+const res=await fetch(API+"/customers",{headers:{Authorization:"Bearer "+token}});
+const data=await res.json();
 
-  const res = await fetch(API + "/customers", {
-    headers: { "Authorization": "Bearer " + token }
-  });
+document.getElementById("total").innerText=data.length;
 
-  const data = await res.json();
-
-  if (Array.isArray(data)) {
-    document.getElementById("totalCustomers").innerText = data.length;
-    document.getElementById("activeUsers").innerText =
-      data.filter(c => c.status !== "disabled").length;
-
-    let income = 0;
-    data.forEach(c => income += Number(c.monthly_bill || 0));
-
-    document.getElementById("monthlyIncome").innerText = "৳" + income;
-    document.getElementById("dueBills").innerText = "৳" + income;
-  }
+let income=0;
+data.forEach(c=>income+=Number(c.monthly_bill||0));
+document.getElementById("income").innerText=income;
 }
 
-function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "login.html";
+function logout(){
+localStorage.removeItem("token");
+location.href="login.html";
 }
 
-loadStats();
+load();
 </script>
 
 </body>
