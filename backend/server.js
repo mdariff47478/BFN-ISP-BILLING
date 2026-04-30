@@ -57,6 +57,46 @@ app.post("/api/customers", async (req, res) => {
   res.json(data);
 });
 
+// ✅ Enable customer
+app.post("/api/customers/:id/enable", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("customers")
+    .update({ status: "active" })
+    .eq("id", id)
+    .select();
+
+  if (error) return res.status(400).json(error);
+  res.json({ message: "Customer enabled", data });
+});
+
+// ✅ Disable customer
+app.post("/api/customers/:id/disable", async (req, res) => {
+  const { id } = req.params;
+
+  const { data, error } = await supabase
+    .from("customers")
+    .update({ status: "disabled" })
+    .eq("id", id)
+    .select();
+
+  if (error) return res.status(400).json(error);
+  res.json({ message: "Customer disabled", data });
+});
+
+// 📡 MikroTik placeholder route
+app.post("/api/mikrotik/create-user", async (req, res) => {
+  const { username, password, profile } = req.body;
+
+  res.json({
+    message: "MikroTik user create route ready",
+    username,
+    password,
+    profile
+  });
+});
+
 // 📡 Routers
 app.get("/api/routers", async (req, res) => {
   const { data } = await supabase.from("routers").select("*");
