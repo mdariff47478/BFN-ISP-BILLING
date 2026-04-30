@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Noto Sans Bengali', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f4f7fb;
+  color: #101828;
+}
+
+.loginPage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #052e2b, #075985, #0f172a);
+}
+
+.loginCard {
+  width: 360px;
+  padding: 32px;
+  border-radius: 28px;
+  background: rgba(255,255,255,.13);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 30px 90px rgba(0,0,0,.35);
+  color: white;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #22c55e, #06b6d4);
+  font-weight: 900;
+  font-size: 24px;
+}
+
+.loginCard h1 {
+  margin-bottom: 6px;
+}
+
+.loginCard p {
+  opacity: .85;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 14px;
+  outline: none;
+  margin: 8px 0;
+  background: white;
+}
+
+textarea {
+  min-height: 95px;
+}
+
+button {
+  border: 0;
+  border-radius: 14px;
+  padding: 13px 16px;
+  background: #0ea5e9;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.loginCard button {
+  width: 100%;
+  margin-top: 12px;
+  background: linear-gradient(135deg, #22c55e, #06b6d4);
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+aside {
+  width: 270px;
+  background: #0f172a;
+  color: white;
+  padding: 22px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+aside h2 {
+  margin-bottom: 28px;
+}
+
+aside button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  background: transparent;
+  color: #cbd5e1;
+  text-align: left;
+}
+
+aside button:hover {
+  background: #1e293b;
+}
+
+.logout {
+  margin-top: 30px;
+  background: #dc2626 !important;
+  color: white !important;
+}
+
+main {
+  flex: 1;
+  padding: 28px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+.search {
+  background: white;
+  padding: 13px 18px;
+  border-radius: 18px;
+  color: #667085;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(16,24,40,.06);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.card, .panel {
+  background: rgba(255,255,255,.88);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 50px rgba(16,24,40,.08);
+  border-radius: 24px;
+}
+
+.card {
+  padding: 22px;
+}
+
+.card p {
+  margin: 0;
+  color: #667085;
+}
+
+.card h2 {
+  margin: 8px 0 0;
+  font-size: 34px;
+}
+
+.card.danger h2 {
+  color: #dc2626;
+}
+
+.panel {
+  padding: 24px;
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  color: #667085;
+  font-size: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 14px;
+}
+
+td {
+  padding: 14px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.active {
+  background: #dcfce7;
+  color: #166534;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.disabled {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.gridForm {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.gridForm textarea,
+.gridForm button {
+  grid-column: span 2;
+}
+
+@media (max-width: 800px) {
+  .app {
+    flex-direction: column;
+  }
+
+  aside {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  main {
+    padding: 16px;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .gridForm {
+    grid-template-columns: 1fr;
+  }
+
+  .gridForm textarea,
+  .gridForm button {
+    grid-column: span 1;
+  }
+}
