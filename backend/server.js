@@ -36,6 +36,34 @@ app.post("/api/auth/login", async (req, res) => {
   res.json({ token, user });
 });
 
+// 🔥 Create Admin (one-time use)
+app.get("/api/setup-admin", async (req, res) => {
+  try {
+    const hashed = await bcrypt.hash("1234", 10);
+
+    const { data, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          username: "admin",
+          password_hash: hashed,
+          full_name: "System Admin",
+          mobile: "01700000000",
+          role_id: 1,
+          status: "active"
+        }
+      ]);
+
+    if (error) {
+      return res.json({ message: "Admin already exists or error", error });
+    }
+
+    res.json({ message: "Admin created successfully ✅" });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
 // 👥 Get customers
 app.get("/api/customers", async (req, res) => {
   const { data } = await supabase.from("customers").select("*");
