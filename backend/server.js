@@ -1,7 +1,11 @@
-const express = require("express");
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const { createClient } = require("@supabase/supabase-js");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { createClient } from "@supabase/supabase-js";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -12,117 +16,57 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// 🔐 login route
-app.post("/login", (req, res) => {
+// 🔐 Login
+app.post("/api/auth/login", async (req, res) => {
   const { username, password } = req.body;
 
-  if (
-    username === process.env.ADMIN_USERNAME &&
-    password === process.env.ADMIN_PASSWORD
-  ) {
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "2h",
-    });
-    return res.json({ token });
-  } else {
-    return res.status(401).json({ error: "Invalid login" });
-  }
+  const { data: user } = await supabase
+    .from("users")
+    .select("*")
+    .eq("username", username)
+    .single();
+
+  if (!user) return res.status(401).json({ error: "User not found" });
+
+  const match = await bcrypt.compare(password, user.password_hash);
+  if (!match) return res.status(401).json({ error: "Wrong password" });
+
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+
+  res.json({ token, user });
 });
 
-// ❌ Delete customer
-app.delete("/customers/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-
-  const { error } = await supabase
-    .from("customers")
-    .delete()
-    .eq("id", id);
-
-  if (error) return res.status(400).json({ error });
-  res.json({ success: true });
-});
-
-// ✏️ Update customer
-app.put("/customers/:id", verifyToken, async (req, res) => {
-  const { id } = req.params;
-  const { full_name, phone, address, pppoe_username, package_name, monthly_bill } = req.body;
-
-  const { error } = await supabase
-    .from("customers")
-    .update({ full_name, phone, address, pppoe_username, package_name, monthly_bill })
-    .eq("id", id);
-
-  if (error) return res.status(400).json({ error });
-  res.json({ success: true });
-});
-
-// 🔐 middleware
-function verifyToken(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "No token" });
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(403).json({ error: "Invalid token" });
-  }
-}
-
-// ✅ protected add customer
-app.post("/customers", verifyToken, async (req, res) => {
-  const { full_name, phone, address, pppoe_username, package_name, monthly_bill } = req.body;
-
-  const { data, error } = await supabase
-    .from("customers")
-    .insert([{ full_name, phone, address, pppoe_username, package_name, monthly_bill }]);
-
-  if (error) return res.status(400).json({ error });
-  res.json({ success: true, data });
-});
-
-// ✅ protected get customers
-app.get("/customers", verifyToken, async (req, res) => {
-  const { data, error } = await supabase.from("customers").select("*");
-  if (error) return res.status(400).json({ error });
+// 👥 Get customers
+app.get("/api/customers", async (req, res) => {
+  const { data } = await supabase.from("customers").select("*");
   res.json(data);
 });
 
-app.listen(10000, () => console.log("Server running"));
+// ➕ Add customer
+app.post("/api/customers", async (req, res) => {
+  const body = req.body;
 
-// GET bills
-app.get("/bills", verifyToken, async (req, res) => {
   const { data, error } = await supabase
-    .from("bills")
-    .select("*, customers(full_name, phone)");
+    .from("customers")
+    .insert([body]);
 
-  if (error) return res.status(400).json({ error });
+  if (error) return res.status(400).json(error);
+
   res.json(data);
 });
 
-// CREATE bill
-app.post("/bills", verifyToken, async (req, res) => {
-  const { customer_id, month, amount } = req.body;
-
-  const { data, error } = await supabase
-    .from("bills")
-    .insert([{ customer_id, month, amount, status: "unpaid" }])
-    .select();
-
-  if (error) return res.status(400).json({ error });
-  res.json(data[0]);
+// 📡 Routers
+app.get("/api/routers", async (req, res) => {
+  const { data } = await supabase.from("routers").select("*");
+  res.json(data);
 });
 
-// MARK PAID
-app.put("/bills/:id/paid", verifyToken, async (req, res) => {
-  const { id } = req.params;
+// 💰 Bills
+app.get("/api/bills", async (req, res) => {
+  const { data } = await supabase.from("bills").select("*");
+  res.json(data);
+});
 
-  const { error } = await supabase
-    .from("bills")
-    .update({ status: "paid", paid_amount: req.body.paid_amount })
-    .eq("id", id);
-
-  if (error) return res.status(400).json({ error });
-  res.json({ success: true });
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });
